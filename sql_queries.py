@@ -5,8 +5,8 @@ import configparser
 config = configparser.ConfigParser()
 config.read('dwh.cfg')
 
-# DROP TABLES
 
+# DROP TABLES
 staging_events_table_drop = ""
 staging_songs_table_drop = ""
 songplay_table_drop = ""
@@ -15,39 +15,98 @@ song_table_drop = ""
 artist_table_drop = ""
 time_table_drop = ""
 
+
 # CREATE TABLES
+staging_songs_table_create = ("""CREATE TABLE IF NOT EXISTS staging_songs(
+                                     num_songs        INT,
+                                     artist_id        VARCHAR,
+                                     artist_latitude  NUMERIC,
+                                     artist_longitude NUMERIC,
+                                     artist_location  VARCHAR,
+                                     artist_name      VARCHAR,
+                                     song_id          VARCHAR,
+                                     title            VARCHAR,
+                                     duration         NUMERIC,
+                                     year             INT
+                                 );""")
 
-staging_events_table_create= ("""
-""")
+staging_events_table_create= ("""CREATE TABLE IF NOT EXISTS staging_events(
+                                     artist        VARCHAR,
+                                     auth          VARCHAR,
+                                     firstName     VARCHAR,
+                                     gender        CHAR,
+                                     itemInSession INT,
+                                     lastName      VARCHAR,
+                                     length        NUMERIC,
+                                     level         VARCHAR,
+                                     location      VARCHAR,
+                                     method        VARCHAR,
+                                     page          VARCHAR,
+                                     registration  NUMERIC,
+                                     sessionId     INT,
+                                     song          VARCHAR,
+                                     status        INT,
+                                     ts            BIGINT,
+                                     userAgent     VARCHAR,
+                                     userId        VARCHAR
+                                 );""")
 
-staging_songs_table_create = ("""
-""")
+song_table_create = ("""CREATE TABLE IF NOT EXISTS songs(
+                            song_id   VARCHAR PRIMARY KEY, 
+                            title     VARCHAR, 
+                            artist_id VARCHAR, 
+                            year      INT, 
+                            duration  NUMERIC
+                        );""")
 
-songplay_table_create = ("""
-""")
+artist_table_create = ("""CREATE TABLE IF NOT EXISTS artists(
+                              artist_id VARCHAR PRIMARY KEY, 
+                              name      VARCHAR, 
+                              location  VARCHAR, 
+                              latitude  NUMERIC, 
+                              longitude NUMERIC
+                          );""")
 
-user_table_create = ("""
-""")
+user_table_create = ("""CREATE TABLE IF NOT EXISTS users(
+                            user_id    VARCHAR PRIMARY KEY, 
+                            first_name VARCHAR, 
+                            last_name  VARCHAR, 
+                            gender     CHAR, 
+                            level      VARCHAR
+                        );""")
 
-song_table_create = ("""
-""")
+songplay_table_create = ("""CREATE TABLE IF NOT EXISTS songplays(
+                                songplay_id INT IDENTITY(0,1) PRIMARY KEY, 
+                                start_time  TIMESTAMP         NOT NULL, 
+                                user_id     VARCHAR           NOT NULL, 
+                                level       VARCHAR, 
+                                song_id     VARCHAR, 
+                                artist_id   VARCHAR, 
+                                session_id  INT, 
+                                location    VARCHAR, 
+                                user_agent  VARCHAR
+                            );""")
 
-artist_table_create = ("""
-""")
+time_table_create = ("""CREATE TABLE IF NOT EXISTS time(
+                            start_time TIMESTAMP PRIMARY KEY, 
+                            hour       INT, 
+                            day        INT,
+                            week       INT,
+                            month      INT, 
+                            year       INT, 
+                            weekday    INT
+                        );""")
 
-time_table_create = ("""
-""")
 
 # STAGING TABLES
-
 staging_events_copy = ("""
 """).format()
 
 staging_songs_copy = ("""
 """).format()
 
-# FINAL TABLES
 
+# FINAL TABLES
 songplay_table_insert = ("""
 """)
 
@@ -63,8 +122,8 @@ artist_table_insert = ("""
 time_table_insert = ("""
 """)
 
-# QUERY LISTS
 
+# QUERY LISTS
 create_table_queries = [staging_events_table_create, staging_songs_table_create, songplay_table_create, user_table_create, song_table_create, artist_table_create, time_table_create]
 drop_table_queries = [staging_events_table_drop, staging_songs_table_drop, songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
 copy_table_queries = [staging_events_copy, staging_songs_copy]
