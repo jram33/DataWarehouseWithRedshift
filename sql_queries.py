@@ -98,12 +98,22 @@ time_table_create = ("""CREATE TABLE IF NOT EXISTS time(
                         );""")
 
 
-# STAGING TABLES
-staging_events_copy = ("""
-""").format()
+# STAGING TABLES  
+staging_songs_copy = ("""copy staging_songs from '{}'
+                         credentials 'aws_iam_role={}'
+                         region 'us-west-2' 
+                         COMPUPDATE OFF STATUPDATE OFF
+                         JSON 'auto'
+                      """).format(config.get('S3', 'SONG_DATA'), 
+                                  config.get('IAM_ROLE', 'ARN'))
 
-staging_songs_copy = ("""
-""").format()
+staging_events_copy = ("""copy staging_events from '{}'
+                          credentials 'aws_iam_role={}'
+                          region 'us-west-2' 
+                          COMPUPDATE OFF STATUPDATE OFF
+                          JSON '{}'""").format(config.get('S3', 'LOG_DATA'),
+                                               config.get('IAM_ROLE', 'ARN'),
+                                               config.get('S3', 'LOG_JSONPATH'))
 
 
 # FINAL TABLES
