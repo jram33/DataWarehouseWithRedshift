@@ -117,20 +117,59 @@ staging_events_copy = ("""copy staging_events from '{}'
 
 
 # FINAL TABLES
-songplay_table_insert = ("""
-""")
+song_table_insert = ("""INSERT INTO songs(song_id, title, artist_id, year, duration)
+                        SELECT DISTINCT ss.song_id, ss.title, ss.artist_id, 
+                                        ss.year, ss.duration
+                        FROM staging_songs ss;
+                     """)
 
-user_table_insert = ("""
-""")
+artist_table_insert = ("""INSERT INTO artists(artist_id, name, location, 
+                                              latitude, longitude)
+                          SELECT DISTINCT
+                              ss.artist_id, ss.artist_name, ss.artist_location, 
+                              ss.artist_latitude, ss.artist_longitude
+                          FROM staging_songs ss;
+                       """)
 
-song_table_insert = ("""
-""")
+user_table_insert = ("""INSERT INTO users(user_id, first_name, last_name, 
+                                          gender, level)
+                        SELECT DISTINCT se.userId, se.firstName, se.lastName, 
+                                        se.gender, se.level
+                        FROM staging_events se
+                        WHERE se.page = 'NextSong';
+                     """)
 
-artist_table_insert = ("""
-""")
+songplay_table_insert = ("""INSERT INTO songplays(start_time, user_id, 
+                                                  level, song_id, 
+                                                  artist_id, session_id, 
+                                                  location, user_agent)
+                            SELECT TIMESTAMP 'epoch' + se.ts/1000 * interval '1 second' AS start_time,
+                                   se.userId, se.level, music.song_id, 
+                                   music.artist_id, se.sessionId, 
+                                   se.location, se.userAgent
+                            FROM staging_events se
+                            LEFT JOIN(
+                                      SELECT s.song_id, s.title, s.duration, a.artist_id, a.name
+                                      FROM songs s
+                                      LEFT JOIN artists a
+                                      ON s.artist_id = a.artist_id) as music
+                            ON se.song = music.title AND 
+                               se.artist = music.name AND 
+                               se.length = music.duration
+                            WHERE se.page = 'NextSong';
+                        """)
 
-time_table_insert = ("""
-""")
+time_table_insert = ("""INSERT INTO time(start_time, hour, day, week,
+                                         month, year, weekday)
+                        SELECT DISTINCT start_time,
+                            EXTRACT(HOUR FROM start_time),
+                            EXTRACT(DAY FROM start_time),
+                            EXTRACT(WEEK FROM start_time),
+                            EXTRACT(MONTH FROM start_time),
+                            EXTRACT(YEAR FROM start_time),
+                            EXTRACT(DOW FROM start_time)
+                        FROM songplays;
+                     """)
 
 
 # QUERY LISTS
