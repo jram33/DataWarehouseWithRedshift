@@ -4,12 +4,36 @@ from sql_queries import copy_table_queries, insert_table_queries
 
 
 def load_staging_tables(cur, conn):
+    """
+    Description:
+        Copy data to staging tables.
+
+    Args:
+        cur: the cursor object.
+        conn: the database connection object.
+        
+    Returns:
+        None
+    
+    """
     for query in copy_table_queries:
         cur.execute(query)
         conn.commit()
 
 
 def insert_tables(cur, conn):
+    """
+    Description:
+        Insert data from staging to analytical tables.
+
+    Args:
+        cur: the cursor object.
+        conn: the database connection object.
+        
+    Returns:
+        None
+    
+    """
     for query in insert_table_queries:
         cur.execute(query)
         conn.commit()
